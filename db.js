@@ -4,7 +4,7 @@ function model(table){
 	this._table = table;
 	
 	this.db = openDatabase("kudb", "1.0", "websql数据库", 1024 * 1024 * 100);
-	this._datas = [];
+	this._datas = {};
 	this._where = [];
 	this._order = '';
 	this._limit = '';
@@ -41,7 +41,7 @@ function model(table){
 		var sql = "create table if not exists "+ this._table;
 		var colstr = "";
 		var col_arr = [];
-		if(cols && cols.length>0){
+		if(cols){
 			for(col in cols){
 				col_arr.push(col+" "+cols[col]);
 			}
@@ -91,20 +91,20 @@ function model(table){
 			ret.sql = "update " + this._table;
 			var update_obj = this.parseUpdate(this._datas);
 			ret.sql += " set "+ update_obj.sql;
-			ret.param = ret.param.concat(update_obj.val);
+			ret.param = ret.param.concat(update_obj.vals);
 		}else if(queryType=='delete'){
 			ret.sql = "delete from " + this._table;
 		}else if(queryType=='insert'){
 			var insert_obj = this.parseInsert(this._datas);
 			ret.sql = "insert into " + this._table + "("+ insert_obj.colsql +") values("+ insert_obj.valsql +")";
-			ret.param = ret.param.concat(insert_obj.val);
+			ret.param = ret.param.concat(insert_obj.vals);
 			return ret;
 		}
 		//组装where
-		if(this._where.length>0){
-			var where_obj = wherethis.parseWhere(this._where);
+		if(this._where){
+			var where_obj = this.parseWhere(this._where);
 			ret.sql += " where "+ where_obj.sql;
-			ret.param = ret.param.concat(where_obj.val);
+			ret.param = ret.param.concat(where_obj.vals);
 		}
 		//组装order
 		if(this._order.length>0){
