@@ -10,6 +10,7 @@ function model(table){
 	this._limit = '';
 	this._group = '';
 	this._field = '*';
+	this._lastsql = '';
 	
 	this.data = function(datas){
 		this._datas = datas;
@@ -139,21 +140,31 @@ function model(table){
 			for(var key in where){
 				var val = where[key];
 				var operate = "=";
-				if(typeof(val)=="object" && val.length==2){
+				console.log(key);
+				console.log(val);
+				
+				if(!isNaN(key)){//数字下标
+					var subret = this.parseWhere(val); //递归分析子条件
+					where_key_arr.push(subret.sql);
+					where_val.concat(subret.vals);
+				}else if(Array.isArray(val) && val.length==2){//数组类型，带操作符
 					operate = val[0];
+					where_key_arr.push(key + operate + "?");
 					where_val.push(val[1]);
-				}else{
+				}else{//键值对
+					where_key_arr.push(key + operate + "?");
 					where_val.push(val);
 				}
-				where_key_arr.push(key + operate + "?");
 			}
-			where_str = where_key_arr.length>0 ? where_key_arr.join(' '+ operate +' ') : '';
+			where_str = where_key_arr.length>0 ? "("+ where_key_arr.join(' '+ logic +' ') +")" : '';
+			console.log(where_str);
 		}
 		return {
 			"sql":where_str,
 			"vals":where_val
 		};
 	};
+	
 	
 	//根据data数据生成update语句中的字段
 	this.parseUpdate = function(datas){
@@ -194,10 +205,14 @@ function model(table){
 	};
 	
 	this.query = function(sql,param,callback){
+		this._lastsql = sql;
 		this.db.transaction(function(tx) {
 			tx.executeSql(sql, param, callback);
 		});
 	};
+	this.getLastSql = function(){
+		return this._lastsql;
+	}
 	
 	return this;
 }

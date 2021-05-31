@@ -74,6 +74,7 @@ db("表名").dropTable()
 	
 	条件通常是键值对，特殊之处在于， 我设置了一个 _logic 保留字段，
 	默认情况下多条件之间是用and组合的，可以用 _logic 指定为or
+	数字下标代表子条件
 	而键值对默认是用等号，如果有其他特殊需求，可以参考以下cash的写法把判断符号写上
 	var condition = {
 		"_logic":"or",
@@ -81,6 +82,30 @@ db("表名").dropTable()
 		"cash":["<",10]
 	};
 	db("cars").where(condition).select()
+	将执行查询
+	select * from cars where id=1 or cash<10
+	
+	
+	复杂条件支持:
+	var condition = {
+		"_logic":"or",
+		"id":1,
+		"cash":["<",10],
+		
+		"1":{
+			"_logic":"and",
+			"id":1,
+			"cash":10
+		},
+		
+		"2": "cash<>10 and id=2"
+	};
+	db("cars").where(condition).select()
+	将执行查询
+	select * from cars where id=1 or cash<10 or (id=1 and cash=10) or (cash<>10 and id=2)
+	
+	
+	
 	
 ## .data( ) 方法
 	db("cars").data(键值对).insert();
