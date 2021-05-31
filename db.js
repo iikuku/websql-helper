@@ -37,6 +37,10 @@ function model(table){
 		return this;
 	};
 	
+	this.limit = function(limit){
+		this._limit = limit;
+		return this;
+	};
 	this.table = function(table){
 		init();
 		this._table = table;
@@ -107,10 +111,13 @@ function model(table){
 			return ret;
 		}
 		//组装where
-		var where_obj = this.parseWhere(this._where);
-		ret.sql += " where 1=1 and "+ where_obj.sql;
-		ret.param = ret.param.concat(where_obj.vals);
-		
+		if(this._where){
+			var where_obj = this.parseWhere(this._where);
+			if(where_obj.sql.length>0){
+				ret.sql += " where "+ where_obj.sql;
+				ret.param = ret.param.concat(where_obj.vals);
+			}
+		}
 		//组装order
 		if(this._order.length>0){
 			ret.sql += " order by " + this._order;
