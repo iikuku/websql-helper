@@ -107,11 +107,10 @@ function model(table){
 			return ret;
 		}
 		//组装where
-		if(this._where){
-			var where_obj = this.parseWhere(this._where);
-			ret.sql += " where "+ where_obj.sql;
-			ret.param = ret.param.concat(where_obj.vals);
-		}
+		var where_obj = this.parseWhere(this._where);
+		ret.sql += " where 1=1 and "+ where_obj.sql;
+		ret.param = ret.param.concat(where_obj.vals);
+		
 		//组装order
 		if(this._order.length>0){
 			ret.sql += " order by " + this._order;
