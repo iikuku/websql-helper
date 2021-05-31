@@ -32,6 +32,11 @@ function model(table){
 		return this;
 	};
 	
+	this.field = function(field){
+		this._field = field;
+		return this;
+	};
+	
 	this.table = function(table){
 		init();
 		this._table = table;
