@@ -145,8 +145,6 @@ function model(table){
 			for(var key in where){
 				var val = where[key];
 				var operate = "=";
-				console.log(key);
-				console.log(val);
 				
 				if(!isNaN(key)){//数字下标
 					var subret = this.parseWhere(val); //递归分析子条件
@@ -162,7 +160,6 @@ function model(table){
 				}
 			}
 			where_str = where_key_arr.length>0 ? "("+ where_key_arr.join(' '+ logic +' ') +")" : '';
-			console.log(where_str);
 		}
 		return {
 			"sql":where_str,
